@@ -5,6 +5,8 @@ use url::Url;
 use url::ParseError as UrlParseError;
 use thiserror::Error;
 
+mod crawler;
+
 pub struct LinkExtractor {
     client: Client,
 }
