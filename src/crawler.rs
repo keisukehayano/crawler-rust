@@ -15,7 +15,7 @@ where
 {
     pub fn new(graph: &'a G, start: <G as AdjacentNodes>::Node) -> Self {
         let mut visit = VecDeque::new();
-        let mut visited = HashSet::new();
+        let visited = HashSet::new();
 
         visit.push_back(start);
 

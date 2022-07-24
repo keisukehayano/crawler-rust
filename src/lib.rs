@@ -1,3 +1,5 @@
+pub mod crawler;
+
 use reqwest::blocking::Client;
 use select::document::Document;
 use select::predicate::Name;
@@ -5,7 +7,6 @@ use url::Url;
 use url::ParseError as UrlParseError;
 use thiserror::Error;
 
-mod crawler;
 
 pub struct LinkExtractor {
     client: Client,
@@ -69,4 +70,30 @@ pub enum GetLinksError {
     AbsolutuzuUrl(#[source] url::ParseError),
     #[error("Server returned an error")]
     ServerError(#[source] reqwest::Error),
+}
+
+impl crawler::AdjacentNodes for LinkExtractor {
+    type Node = Url;
+
+    fn adjacetn_nodes(&self, v: &Self::Node) -> Vec<Self::Node> {
+        match self.get_links(v.clone()) {
+            Ok(links) => links,
+            Err(e) => {
+                use std::error::Error;
+                log::warn!("Error occurred: {}", e);
+
+                let mut e = e.source();
+
+                loop {
+                    if let Some(err) = e {
+                        log::warn!("Error source: {}", err);
+                        e = err.source();
+                    } else {
+                        break;
+                    }
+                }
+                vec![]
+            },
+        }
+    }
 }
